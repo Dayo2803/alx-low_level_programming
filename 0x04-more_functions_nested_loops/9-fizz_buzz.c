@@ -1,6 +1,6 @@
 #include <stdio.h>
 /**
- * main - print number 1 to 100
+ * main - prints number from 1 to 100, followed by a new one
  * but for multiple of three print fizz
  * and multipeof five print buzz
  * return: 0
@@ -9,8 +9,8 @@
 int main(void)
 {
 	int num;
-	
-	for (num = 1; num <= 100; num++)
+
+	for (num = 1, num <= 100, num++)
 	{
 			if ((num % 3) == 0 && (num % 5) == 0)
 				printf("FizzBuzz");
@@ -25,8 +25,6 @@ int main(void)
 				continue;
 			printf(" ");
 	}
-	
 	printf("\n");
-
 	return (0);
 }
