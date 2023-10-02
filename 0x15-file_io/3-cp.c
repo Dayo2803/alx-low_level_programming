@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 char *create_buffer(char *file);
-void close_file(int cd);
+void close_file(int fd);
 
 /**
  * create_buffer - Allocates 1024 bytes for a buffer.
@@ -13,33 +13,33 @@ void close_file(int cd);
  */
 char *create_buffer(char *file)
 {
-	char *cat;
+	char *buffer;
 
-	cat = malloc(sizeof(char) * 1024);
+	buffer = malloc(sizeof(char) * 1024);
 
-	if (cat == NULL)
+	if (buffer == NULL)
 	{
 		dprintf(STDERR_FILENO,
 			"Error: Can't write to %s\n", file);
 		exit(99);
 	}
 
-	return (cat);
+	return (buffer);
 }
 
 /**
  * close_file - Closes file descriptors.
- * @cd: The file descriptor to be closed.
+ * @fd: The file descriptor to be closed.
  */
-void close_file(int cd)
+void close_file(int fd)
 {
-	int s;
+	int c;
 
-	s = close(cd);
+	c = close(fd);
 
-	if (s == -1)
+	if (c == -1)
 	{
-		dprintf(STDERR_FILENO, "Error: Can't close cd %d\n", cd);
+		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", fd);
 		exit(100);
 	}
 }
@@ -58,8 +58,8 @@ void close_file(int cd)
  */
 int main(int argc, char *argv[])
 {
-	int go, to, v, z;
-	char *cat;
+	int from, to, r, w;
+	char *buffer;
 
 	if (argc != 3)
 	{
@@ -67,36 +67,36 @@ int main(int argc, char *argv[])
 		exit(97);
 	}
 
-	cat = create_buffer(argv[2]);
-	go = open(argv[1], O_RDONLY);
-	v = read(go, cat, 1024);
+	buffer = create_buffer(argv[2]);
+	from = open(argv[1], O_RDONLY);
+	r = read(from, buffer, 1024);
 	to = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
 
 	do {
-		if (go == -1 || v == -1)
+		if (from == -1 || r == -1)
 		{
 			dprintf(STDERR_FILENO,
 				"Error: Can't read from file %s\n", argv[1]);
-			free(cat);
+			free(buffer);
 			exit(98);
 		}
 
-		z = write(to, cat, v);
-		if (to == -1 || z == -1)
+		w = write(to, buffer, r);
+		if (to == -1 || w == -1)
 		{
 			dprintf(STDERR_FILENO,
 				"Error: Can't write to %s\n", argv[2]);
-			free(cat);
+			free(buffer);
 			exit(99);
 		}
 
-		v = read(go, cat, 1024);
+		r = read(from, buffer, 1024);
 		to = open(argv[2], O_WRONLY | O_APPEND);
 
-	} while (v > 0);
+	} while (r > 0);
 
-	free(cat);
-	close_file(go);
+	free(buffer);
+	close_file(from);
 	close_file(to);
 
 	return (0);
